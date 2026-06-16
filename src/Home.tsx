@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Video, Keyboard, Settings, HelpCircle, User, Plus } from 'lucide-react';
+import { Video, Keyboard, Settings, HelpCircle, User, Plus, X } from 'lucide-react';
 import { useSettings } from './SettingsContext';
 
 export default function Home() {
   const [meetingCode, setMeetingCode] = useState('');
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const navigate = useNavigate();
   const { setIsSettingsOpen } = useSettings();
 
@@ -42,7 +43,7 @@ export default function Home() {
           <button className="btn-icon" aria-label="Settings" onClick={() => setIsSettingsOpen(true)}>
             <Settings size={20} />
           </button>
-          <button className="btn-icon" aria-label="Help">
+          <button className="btn-icon" aria-label="Help" onClick={() => setIsHelpOpen(true)}>
             <HelpCircle size={20} />
           </button>
           <button className="btn-icon" aria-label="User Profile">
@@ -118,6 +119,55 @@ export default function Home() {
           </div>
         </div>
       </main>
+
+      {/* Модальное окно информации */}
+      {isHelpOpen && (
+        <div className="modal-overlay" onClick={() => setIsHelpOpen(false)}>
+          <div className="modal-content glass-panel" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>О проекте</h2>
+              <button className="btn-icon" onClick={() => setIsHelpOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            <div className="modal-body" style={{ lineHeight: '1.6', fontSize: '0.95rem' }}>
+              <p style={{ marginBottom: '1.2rem' }}>
+                Добро пожаловать в <strong>Топовые созвоны</strong>! Мы создали эту платформу, чтобы ваше общение было максимально комфортным и безопасным.
+              </p>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                  <div style={{ fontSize: '1.2rem', marginTop: '2px' }}>🔒</div>
+                  <div>
+                    <strong style={{ color: 'var(--text)', display: 'block', marginBottom: '4px' }}>Надежность и доверие</strong>
+                    <span style={{ color: 'var(--text-secondary)' }}>Ваши звонки надежно защищены. Мы не храним ваши данные и гарантируем полную приватность общения. Нам можно доверять!</span>
+                  </div>
+                </div>
+                
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                  <div style={{ fontSize: '1.2rem', marginTop: '2px' }}>🚀</div>
+                  <div>
+                    <strong style={{ color: 'var(--text)', display: 'block', marginBottom: '4px' }}>Отличная работа</strong>
+                    <span style={{ color: 'var(--text-secondary)' }}>Платформа оптимизирована для быстрой работы без задержек и подвисаний. Качество связи всегда на высоте.</span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', background: 'rgba(99, 102, 241, 0.1)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+                  <div style={{ fontSize: '1.2rem', marginTop: '2px' }}>💎</div>
+                  <div>
+                    <strong style={{ color: 'var(--primary)', display: 'block', marginBottom: '4px' }}>Абсолютно бесплатно</strong>
+                    <span style={{ color: 'var(--text)' }}>Мы не требуем подписок, не ставим лимиты на время звонка и не берем деньги за премиум-функции. Всё это доступно вам бесплатно и навсегда.</span>
+                  </div>
+                </div>
+              </div>
+              
+              <button className="btn btn-primary" style={{ width: '100%' }} onClick={() => setIsHelpOpen(false)}>
+                Понятно, спасибо!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
