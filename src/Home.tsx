@@ -35,7 +35,7 @@ export default function Home() {
     <>
       <header className="container header">
         <div className="logo animate-fade-in">
-          <img src="/logo.jpg" alt="Logo" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'cover' }} />
+          <img src="./logo.jpg" alt="Logo" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'cover' }} />
           <span>Топовые созвоны</span>
         </div>
         <div className="nav-actions animate-fade-in delay-100">
@@ -96,7 +96,7 @@ export default function Home() {
           
           <div className="hero-image-wrapper animate-fade-in delay-200">
             <img 
-              src="/hero_illustration.jpg" 
+              src="./hero_illustration.jpg" 
               alt="Video Conference Abstract" 
               className="hero-image"
             />

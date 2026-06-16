@@ -90,7 +90,7 @@ export default function Room() {
       {/* Header */}
       <header className="room-header glass-panel">
         <div className="logo">
-          <img src="/logo.jpg" alt="Logo" style={{ width: 28, height: 28, borderRadius: 8, objectFit: 'cover' }} />
+          <img src="./logo.jpg" alt="Logo" style={{ width: 28, height: 28, borderRadius: 8, objectFit: 'cover' }} />
           <span style={{ fontSize: '1.25rem' }}>Встреча: {roomId}</span>
         </div>
         
