@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Video, Keyboard, Settings, HelpCircle, User, Plus, X } from 'lucide-react';
 import { useSettings } from './SettingsContext';
@@ -6,8 +6,21 @@ import { useSettings } from './SettingsContext';
 export default function Home() {
   const [meetingCode, setMeetingCode] = useState('');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navigate = useNavigate();
-  const { setIsSettingsOpen } = useSettings();
+  const { setIsSettingsOpen, userName, setUserName, meetingsCount, incrementMeetings, avatarUrl, setAvatarUrl } = useSettings();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Генерирует уникальный красивый код формата "abc-defg-hij"
   const generateRoomId = () => {
@@ -18,6 +31,7 @@ export default function Home() {
 
   const handleCreateMeeting = () => {
     // Каждое нажатие генерирует абсолютно новый и уникальный номер комнаты
+    incrementMeetings();
     const roomId = generateRoomId();
     navigate(`/room/${roomId}`);
   };
@@ -25,6 +39,7 @@ export default function Home() {
   const handleJoinMeeting = () => {
     const code = meetingCode.trim();
     if (code) {
+      incrementMeetings();
       // Если вставили ссылку целиком (http://.../room/abc-defg-hij), берем только последнюю часть
       // Если просто код, то берем его
       const roomId = code.split('/').pop();
@@ -46,7 +61,7 @@ export default function Home() {
           <button className="btn-icon" aria-label="Help" onClick={() => setIsHelpOpen(true)}>
             <HelpCircle size={20} />
           </button>
-          <button className="btn-icon" aria-label="User Profile">
+          <button className="btn-icon" aria-label="User Profile" onClick={() => setIsProfileOpen(true)}>
             <User size={20} />
           </button>
         </div>
@@ -164,6 +179,66 @@ export default function Home() {
               <button className="btn btn-primary" style={{ width: '100%' }} onClick={() => setIsHelpOpen(false)}>
                 Понятно, спасибо!
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальное окно профиля */}
+      {isProfileOpen && (
+        <div className="modal-overlay" onClick={() => setIsProfileOpen(false)}>
+          <div className="modal-content glass-panel" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Профиль</h2>
+              <button className="btn-icon" onClick={() => setIsProfileOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            <div className="modal-body" style={{ textAlign: 'center' }}>
+              
+              <div style={{
+                width: '80px', height: '80px', borderRadius: '50%', 
+                background: avatarUrl ? `url(${avatarUrl}) center/cover` : 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '2.5rem', fontWeight: 'bold', color: 'white',
+                margin: '0 auto 1.5rem auto',
+                boxShadow: '0 8px 16px rgba(99, 102, 241, 0.3)',
+                cursor: 'pointer',
+                position: 'relative',
+                transition: 'transform 0.2s ease',
+              }}
+              onClick={() => fileInputRef.current?.click()}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              title="Изменить аватарку"
+              >
+                {!avatarUrl && (userName ? userName.charAt(0).toUpperCase() : 'Г')}
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  ref={fileInputRef} 
+                  style={{ display: 'none' }} 
+                  onChange={handleAvatarChange}
+                />
+              </div>
+
+              <div className="form-group" style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
+                <label>Ваше имя</label>
+                <input 
+                  type="text" 
+                  className="text-input" 
+                  value={userName} 
+                  onChange={e => setUserName(e.target.value)}
+                  placeholder="Как вас называть?"
+                  style={{ width: '100%' }}
+                />
+              </div>
+
+              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>Проведено встреч:</span>
+                <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--primary)' }}>{meetingsCount}</span>
+              </div>
+
             </div>
           </div>
         </div>
