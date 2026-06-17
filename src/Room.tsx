@@ -231,7 +231,7 @@ export default function Room() {
       } catch (e) { console.error("Audio Context setup error", e); }
     };
 
-    if (stream && socketRef.current?.id) attachStream(socketRef.current.id, stream);
+    if (stream) attachStream('local', stream);
     Object.entries(remoteStreams).forEach(([id, s]) => attachStream(id, s));
 
     let frameId: number;
@@ -382,7 +382,7 @@ export default function Room() {
       <main className="room-main">
         <div className="video-grid" style={{ flex: 1 }}>
           {/* Local Video */}
-          <div className="video-wrapper" id={`video-wrapper-${socketRef.current?.id}`}>
+          <div className="video-wrapper" id="video-wrapper-local">
             {error ? (
               <div className="video-placeholder error">
                 <p>{error}</p>
