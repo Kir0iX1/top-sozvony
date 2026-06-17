@@ -29,6 +29,11 @@ export default function Room() {
   const peersRef = useRef<{ [key: string]: RTCPeerConnection }>({});
   const pendingCandidates = useRef<{ [key: string]: RTCIceCandidateInit[] }>({});
 
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analysersRef = useRef<{ [key: string]: AnalyserNode }>({});
+  const dataArraysRef = useRef<{ [key: string]: Uint8Array }>({});
+  const sourcesRef = useRef<{ [key: string]: MediaStreamAudioSourceNode }>({});
+
   const { videoDeviceId, audioDeviceId, volume, setIsSettingsOpen, userName, avatarUrl, noiseSuppression } = useSettings();
 
   useEffect(() => {
@@ -176,16 +181,23 @@ export default function Room() {
       }
     });
 
-    socketRef.current.on('user-left', (userId) => {
+    socketRef.current.on('user-disconnected', (userId) => {
       if (peersRef.current[userId]) {
         peersRef.current[userId].close();
         delete peersRef.current[userId];
       }
+      setParticipants(prev => prev.filter(p => p.id !== userId));
       setRemoteStreams(prev => {
         const newStreams = { ...prev };
         delete newStreams[userId];
         return newStreams;
       });
+      if (sourcesRef.current[userId]) {
+        sourcesRef.current[userId].disconnect();
+        delete sourcesRef.current[userId];
+        delete analysersRef.current[userId];
+        delete dataArraysRef.current[userId];
+      }
     });
 
     return () => {
@@ -202,6 +214,52 @@ export default function Room() {
       videoRef.current.volume = volume; 
     }
   }, [stream, volume]);
+
+  // Audio Analyzer for speaking indicators
+  useEffect(() => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    const ctx = audioContextRef.current;
+    
+    const attachStream = (id: string, stream: MediaStream | null) => {
+      if (!stream || stream.getAudioTracks().length === 0 || analysersRef.current[id]) return;
+      try {
+        const clonedStream = new MediaStream(stream.getAudioTracks());
+        const source = ctx.createMediaStreamSource(clonedStream);
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        sourcesRef.current[id] = source;
+        analysersRef.current[id] = analyser;
+        dataArraysRef.current[id] = new Uint8Array(analyser.frequencyBinCount);
+      } catch (e) { console.error("Audio Context setup error", e); }
+    };
+
+    if (stream && socketRef.current) attachStream(socketRef.current.id, stream);
+    Object.entries(remoteStreams).forEach(([id, s]) => attachStream(id, s));
+
+    let frameId: number;
+    const checkAudio = () => {
+      Object.entries(analysersRef.current).forEach(([id, analyser]) => {
+        const data = dataArraysRef.current[id];
+        analyser.getByteFrequencyData(data);
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) sum += data[i];
+        const isSpeaking = (sum / data.length) > 15;
+        
+        const el = document.getElementById(`video-wrapper-${id}`);
+        if (el) {
+          if (isSpeaking) el.classList.add('speaking');
+          else el.classList.remove('speaking');
+        }
+      });
+      frameId = requestAnimationFrame(checkAudio);
+    };
+    checkAudio();
+
+    return () => cancelAnimationFrame(frameId);
+  }, [stream, remoteStreams]);
 
   const toggleMic = () => {
     if (stream) {
@@ -329,7 +387,7 @@ export default function Room() {
       <main className="room-main">
         <div className="video-grid" style={{ flex: 1 }}>
           {/* Local Video */}
-          <div className="video-wrapper">
+          <div className="video-wrapper" id={`video-wrapper-${socketRef.current?.id}`}>
             {error ? (
               <div className="video-placeholder error">
                 <p>{error}</p>
@@ -361,7 +419,7 @@ export default function Room() {
           {participants.filter(p => p.id !== socketRef.current?.id).map(p => {
             const remoteStream = remoteStreams[p.id];
             return (
-              <div className="video-wrapper" key={p.id}>
+              <div className="video-wrapper" id={`video-wrapper-${p.id}`} key={p.id}>
                 {remoteStream ? (
                   <video 
                     autoPlay 
