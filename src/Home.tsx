@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Video, Keyboard, Settings, HelpCircle, User, Plus, X, Shield, Zap, Globe } from 'lucide-react';
+import { Video, Keyboard, Settings, HelpCircle, User, Plus, X, Shield, Zap, Globe, MessageSquare } from 'lucide-react';
 import { useSettings } from './SettingsContext';
 
 export default function Home() {
@@ -177,8 +177,11 @@ export default function Home() {
         </div>
       </section>
       
-      <footer className="footer container" style={{ borderTop: '1px solid var(--surface-border)', paddingTop: '2rem', paddingBottom: '2rem', marginTop: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+      <footer className="footer container" style={{ borderTop: '1px solid var(--surface-border)', paddingTop: '2rem', paddingBottom: '2rem', marginTop: '2rem', textAlign: 'center', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
         <p>© 2026 Топовые созвоны. Сделано для комфортного общения.</p>
+        <a href="https://t.me/Kir0iX" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ textDecoration: 'none', padding: '0.5rem 1rem', fontSize: '0.9rem' }}>
+          <MessageSquare size={18} /> Обратная связь
+        </a>
       </footer>
 
       {/* Модальное окно информации */}
