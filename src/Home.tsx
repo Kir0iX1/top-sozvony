@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Video, Keyboard, Settings, HelpCircle, User, Plus, X } from 'lucide-react';
+import { Video, Keyboard, Settings, HelpCircle, User, Plus, X, Shield, Zap, Globe } from 'lucide-react';
 import { useSettings } from './SettingsContext';
 
 export default function Home() {
@@ -134,6 +134,52 @@ export default function Home() {
           </div>
         </div>
       </main>
+
+      <section className="container features-section">
+        <h2 style={{ textAlign: 'center', marginBottom: '3rem' }}>Почему выбирают нас</h2>
+        <div className="features-grid">
+          <div className="feature-card glass-panel">
+            <div className="feature-icon"><Shield size={32} color="var(--accent-primary)" /></div>
+            <h3>Абсолютная безопасность</h3>
+            <p>Мы используем передовые технологии. Ваши данные не хранятся на серверах и передаются в зашифрованном виде.</p>
+          </div>
+          <div className="feature-card glass-panel">
+            <div className="feature-icon"><Zap size={32} color="#f59e0b" /></div>
+            <h3>Молниеносная скорость</h3>
+            <p>Оптимизированные алгоритмы WebRTC обеспечивают минимальную задержку и кристально чистое качество видео.</p>
+          </div>
+          <div className="feature-card glass-panel">
+            <div className="feature-icon"><Globe size={32} color="#10b981" /></div>
+            <h3>Доступно везде</h3>
+            <p>Работает в браузере на любом устройстве. Не нужно скачивать тяжелые приложения или плагины.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="container how-it-works">
+        <h2 style={{ textAlign: 'center', marginBottom: '3rem' }}>Как это работает</h2>
+        <div className="steps-container">
+          <div className="step-item">
+            <div className="step-number">1</div>
+            <h3>Создайте комнату</h3>
+            <p>Нажмите одну кнопку, и система мгновенно сгенерирует уникальную безопасную ссылку.</p>
+          </div>
+          <div className="step-item">
+            <div className="step-number">2</div>
+            <h3>Поделитесь ссылкой</h3>
+            <p>Отправьте скопированную ссылку друзьям или коллегам в любой удобный мессенджер.</p>
+          </div>
+          <div className="step-item">
+            <div className="step-number">3</div>
+            <h3>Начните общение</h3>
+            <p>Наслаждайтесь качественной связью, делитесь экраном и общайтесь в чате без ограничений.</p>
+          </div>
+        </div>
+      </section>
+      
+      <footer className="footer container" style={{ borderTop: '1px solid var(--surface-border)', paddingTop: '2rem', paddingBottom: '2rem', marginTop: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+        <p>© 2026 Топовые созвоны. Сделано для комфортного общения.</p>
+      </footer>
 
       {/* Модальное окно информации */}
       {isHelpOpen && (
