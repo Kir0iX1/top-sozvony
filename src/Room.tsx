@@ -25,7 +25,6 @@ export default function Room() {
   const screenStreamRef = useRef<MediaStream | null>(null);
   
   const [remoteStreams, setRemoteStreams] = useState<{ [key: string]: MediaStream }>({});
-  const [connectionStates, setConnectionStates] = useState<{ [key: string]: string }>({});
   const peersRef = useRef<{ [key: string]: RTCPeerConnection }>({});
   const pendingCandidates = useRef<{ [key: string]: RTCIceCandidateInit[] }>({});
 
@@ -117,10 +116,6 @@ export default function Room() {
 
       peer.ontrack = (event) => {
         setRemoteStreams(prev => ({ ...prev, [targetId]: event.streams[0] }));
-      };
-
-      peer.oniceconnectionstatechange = () => {
-        setConnectionStates(prev => ({ ...prev, [targetId]: peer.iceConnectionState }));
       };
 
       peer.onicecandidate = (event) => {
@@ -441,9 +436,7 @@ export default function Room() {
                     </div>
                   </div>
                 )}
-                <div className="user-label">
-                  {p.userName} {isMe ? '(Вы)' : ''}
-                </div>
+                <div className="user-label">{p.userName}</div>
               </div>
             );
           })}
