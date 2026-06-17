@@ -26,6 +26,7 @@ export default function Room() {
   
   const [remoteStreams, setRemoteStreams] = useState<{ [key: string]: MediaStream }>({});
   const peersRef = useRef<{ [key: string]: RTCPeerConnection }>({});
+  const pendingCandidates = useRef<{ [key: string]: RTCIceCandidateInit[] }>({});
 
   const { videoDeviceId, audioDeviceId, volume, setIsSettingsOpen, userName, avatarUrl, noiseSuppression } = useSettings();
 
@@ -137,6 +138,14 @@ export default function Room() {
       const answer = await peer.createAnswer();
       await peer.setLocalDescription(answer);
       socketRef.current?.emit('answer', { target: payload.sender, sender: socketRef.current?.id, answer });
+
+      // Применяем ICE-кандидаты, которые пришли до Offer'а
+      if (pendingCandidates.current[payload.sender]) {
+        for (const candidate of pendingCandidates.current[payload.sender]) {
+          await peer.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error("Error adding queued ICE", e));
+        }
+        delete pendingCandidates.current[payload.sender];
+      }
     });
 
     socketRef.current.on('answer', async (payload) => {
@@ -148,8 +157,14 @@ export default function Room() {
 
     socketRef.current.on('ice-candidate', async (payload) => {
       const peer = peersRef.current[payload.sender];
-      if (peer) {
-        await peer.addIceCandidate(new RTCIceCandidate(payload.candidate)).catch(e => console.error(e));
+      if (peer && peer.remoteDescription) {
+        await peer.addIceCandidate(new RTCIceCandidate(payload.candidate)).catch(e => console.error("Error adding ICE", e));
+      } else {
+        // Если peer еще не создан или не получил Offer, сохраняем кандидата в очередь
+        if (!pendingCandidates.current[payload.sender]) {
+          pendingCandidates.current[payload.sender] = [];
+        }
+        pendingCandidates.current[payload.sender].push(payload.candidate);
       }
     });
 
