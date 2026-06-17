@@ -436,7 +436,7 @@ export default function Room() {
                     </div>
                   </div>
                 )}
-                <div className="user-label">{p.userName}</div>
+                <div className="video-label">{p.userName}</div>
               </div>
             );
           })}
