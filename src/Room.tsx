@@ -442,7 +442,7 @@ export default function Room() {
                   </div>
                 )}
                 <div className="user-label">
-                  {p.userName} {connectionStates[p.id] ? `[${connectionStates[p.id]}]` : ''}
+                  {p.userName} {isMe ? '(Вы)' : ''}
                 </div>
               </div>
             );
