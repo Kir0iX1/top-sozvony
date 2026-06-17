@@ -62,7 +62,7 @@ export default function Room() {
   useEffect(() => {
     if (!stream) return;
 
-    socketRef.current = io('http://localhost:3000');
+    socketRef.current = io('https://sozvon-server.onrender.com');
 
     socketRef.current.emit('join-room', {
       roomId,
