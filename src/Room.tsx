@@ -25,6 +25,7 @@ export default function Room() {
   const screenStreamRef = useRef<MediaStream | null>(null);
   
   const [remoteStreams, setRemoteStreams] = useState<{ [key: string]: MediaStream }>({});
+  const [connectionStates, setConnectionStates] = useState<{ [key: string]: string }>({});
   const peersRef = useRef<{ [key: string]: RTCPeerConnection }>({});
   const pendingCandidates = useRef<{ [key: string]: RTCIceCandidateInit[] }>({});
 
@@ -84,6 +85,9 @@ export default function Room() {
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'stun:stun3.l.google.com:19302' },
+          { urls: 'stun:stun4.l.google.com:19302' },
           { 
             urls: 'turn:openrelay.metered.ca:80', 
             username: 'openrelayproject', 
@@ -108,6 +112,10 @@ export default function Room() {
 
       peer.ontrack = (event) => {
         setRemoteStreams(prev => ({ ...prev, [targetId]: event.streams[0] }));
+      };
+
+      peer.oniceconnectionstatechange = () => {
+        setConnectionStates(prev => ({ ...prev, [targetId]: peer.iceConnectionState }));
       };
 
       peer.onicecandidate = (event) => {
@@ -375,7 +383,9 @@ export default function Room() {
                     </div>
                   </div>
                 )}
-                <div className="video-label">{p.userName}</div>
+                <div className="user-label">
+                  {p.userName} {connectionStates[p.id] ? `[${connectionStates[p.id]}]` : ''}
+                </div>
               </div>
             );
           })}
