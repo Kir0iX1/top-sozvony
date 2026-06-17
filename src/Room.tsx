@@ -236,14 +236,14 @@ export default function Room() {
       } catch (e) { console.error("Audio Context setup error", e); }
     };
 
-    if (stream && socketRef.current) attachStream(socketRef.current.id, stream);
+    if (stream && socketRef.current?.id) attachStream(socketRef.current.id, stream);
     Object.entries(remoteStreams).forEach(([id, s]) => attachStream(id, s));
 
     let frameId: number;
     const checkAudio = () => {
       Object.entries(analysersRef.current).forEach(([id, analyser]) => {
         const data = dataArraysRef.current[id];
-        analyser.getByteFrequencyData(data);
+        analyser.getByteFrequencyData(data as any);
         let sum = 0;
         for (let i = 0; i < data.length; i++) sum += data[i];
         const isSpeaking = (sum / data.length) > 15;
