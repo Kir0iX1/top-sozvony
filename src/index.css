@@ -815,6 +815,20 @@ input.text-input::placeholder {
     height: 48px;
   }
 
+  .floating-card {
+    left: 10px;
+    bottom: -10px;
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .floating-card-2 {
+    right: 10px;
+    top: -10px;
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+
   .room-sidebar {
     position: fixed;
     top: 0;
