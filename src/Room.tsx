@@ -66,8 +66,6 @@ export default function Room() {
 
   // Подключение к Socket.io серверу и настройка WebRTC
   useEffect(() => {
-    if (!stream) return;
-
     socketRef.current = io('https://sozvon-server.onrender.com');
 
     socketRef.current.emit('join-room', {
@@ -124,9 +122,11 @@ export default function Room() {
         ]
       });
 
-      stream.getTracks().forEach(track => {
-        peer.addTrack(track, stream);
-      });
+      if (stream) {
+        stream.getTracks().forEach(track => {
+          peer.addTrack(track, stream);
+        });
+      }
 
       peer.ontrack = (event) => {
         setRemoteStreams(prev => ({ ...prev, [targetId]: event.streams[0] }));
