@@ -159,6 +159,14 @@ export default function Room() {
       const peer = peersRef.current[payload.sender];
       if (peer) {
         await peer.setRemoteDescription(new RTCSessionDescription(payload.answer));
+        
+        // Применяем ICE-кандидаты, которые пришли от Callee до Answer'а
+        if (pendingCandidates.current[payload.sender]) {
+          for (const candidate of pendingCandidates.current[payload.sender]) {
+            await peer.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error("Error adding queued ICE on answer", e));
+          }
+          delete pendingCandidates.current[payload.sender];
+        }
       }
     });
 
