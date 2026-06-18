@@ -427,7 +427,12 @@ export default function Room() {
                     autoPlay 
                     playsInline 
                     className="video-element" 
-                    ref={el => { if (el && el.srcObject !== remoteStream) el.srcObject = remoteStream; }}
+                    ref={el => { 
+                      if (el && el.srcObject !== remoteStream) {
+                        el.srcObject = remoteStream;
+                        el.play().catch(e => console.error("Play error:", e));
+                      } 
+                    }}
                   />
                 ) : (
                   <div className="video-placeholder">
