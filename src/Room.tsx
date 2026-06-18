@@ -105,6 +105,21 @@ export default function Room() {
             urls: 'turn:topsozvony.metered.live:443?transport=tcp', 
             username: '978d06d012a84fb935d9acee', 
             credential: 'deMxA7NHH5jVMN2L' 
+          },
+          { 
+            urls: 'turn:openrelay.metered.ca:80', 
+            username: 'openrelayproject', 
+            credential: 'openrelayproject' 
+          },
+          { 
+            urls: 'turn:openrelay.metered.ca:443', 
+            username: 'openrelayproject', 
+            credential: 'openrelayproject' 
+          },
+          { 
+            urls: 'turn:openrelay.metered.ca:443?transport=tcp', 
+            username: 'openrelayproject', 
+            credential: 'openrelayproject' 
           }
         ]
       });
